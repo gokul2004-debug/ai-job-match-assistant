@@ -17,3 +17,12 @@ class JobApplicationViewSet(viewsets.ModelViewSet):
             match_score=result['score'],
             missing_skills=', '.join(result['missing_skills'])
         )
+        def perform_update(self, serializer):
+         result = calculate_match(
+         self.request.data.get('my_skills', ''),
+         self.request.data.get('job_description', '')
+       )
+        serializer.save(
+        match_score=result['score'],
+        missing_skills=', '.join(result['missing_skills'])
+    )
