@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Job Match Assistant</title>
+    <style>
+        body { font-family: Arial; max-width: 800px; margin: 40px auto; padding: 20px; }
+        .card { border: 1px solid #ccc; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .score { font-size: 24px; font-weight: bold; }
+        .score.high { color: green; }
+        .score.low { color: red; }
+        textarea, input { width: 100%; padding: 8px; margin: 5px 0; }
+        button { padding: 10px 20px; background: #333; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>AI Job Match Assistant</h1>
+
+    <h2>Add New Application</h2>
+    <form id="jobForm">
+        <input type="text" id="company_name" placeholder="Company Name" required>
+        <input type="text" id="job_title" placeholder="Job Title" required>
+        <textarea id="job_description" placeholder="Paste Job Description" rows="4" required></textarea>
+        <input type="text" id="my_skills" placeholder="Your Skills (comma separated)" required>
+        <button type="submit">Analyze & Save</button>
+    </form>
+
+    <h2>Your Applications</h2>
+    {% for app in applications %}
+        <div class="card">
+            <h3>{{ app.job_title }} at {{ app.company_name }}</h3>
+            <p class="score {% if app.match_score >= 70 %}high{% else %}low{% endif %}">
+                Match: {{ app.match_score }}%
+            </p>
+            <p><small>Missing: {{ app.missing_skills }}</small></p>
+        </div>
+    {% endfor %}
+
+    <script>
+        document.getElementById('jobForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const data = {
+                company_name: document.getElementById('company_name').value,
+                job_title: document.getElementById('job_title').value,
+                job_description: document.getElementById('job_description').value,
+                my_skills: document.getElementById('my_skills').value
+            };
+
+            const response = await fetch('/api/applications/', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Error saving application');
+            }
+        });
+    </script>
+</body>
+</html>
